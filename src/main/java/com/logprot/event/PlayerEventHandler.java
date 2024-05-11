@@ -35,7 +35,7 @@ public class PlayerEventHandler
             return;
         }
 
-        if (PlayerManager.getInstance().isPlayerImmune((Player) event.getEntity()))
+        if (PlayerManager.getInstance().isPlayerImmune((Player) event.getEntity(), event.getSource()))
         {
             event.setAmount(0);
         }

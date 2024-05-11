@@ -4,6 +4,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "logprot.refmap.json",
   "mixins": [
+    "ServerPlayerMixin",
+    "ServerGamePacketListenerImplMixin"
   ],
   "client": [
   ],

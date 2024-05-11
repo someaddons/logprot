@@ -5,13 +5,12 @@ import com.logprot.Utils.BlockPosUtils;
 import com.logprot.event.PlayerEventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 /**
  * Class managing the players which logged in
@@ -26,7 +25,7 @@ public class PlayerManager
     /**
      * Stores the logged players, allows gc deletion
      */
-    private WeakHashMap<UUID, PlayerData> playerDataMap = new WeakHashMap<>();
+    private Map<UUID, PlayerData> playerDataMap = new HashMap<>();
 
     private PlayerManager() {}
 
@@ -73,8 +72,6 @@ public class PlayerManager
             return;
         }
 
-        final double maxDist = Math.pow(Logprot.config.getCommonConfig().maxDist, 2);
-
         Iterator<Map.Entry<UUID, PlayerData>> iterator = playerDataMap.entrySet().iterator();
 
         long currentTime = System.currentTimeMillis();
@@ -85,18 +82,6 @@ public class PlayerManager
 
             if (!entry.getValue().player.isAlive())
             {
-                iterator.remove();
-                break;
-            }
-
-            if (BlockPosUtils.dist2DSQ(entry.getValue().loginPos, entry.getValue().player.blockPosition()) > maxDist)
-            {
-                if (Logprot.config.getCommonConfig().debugOutput)
-                {
-                    Logprot.LOGGER.info("Player:" + entry.getValue().player.getName().getString() + " got his login protection removed due to moving");
-                }
-
-                entry.getValue().player.hurtTime = 0;
                 iterator.remove();
                 break;
             }
@@ -119,10 +104,16 @@ public class PlayerManager
      * Whether the player is immune
      *
      * @param playerEntity
+     * @param source
      * @return
      */
-    public boolean isPlayerImmune(final Player playerEntity)
+    public boolean isPlayerImmune(final Player playerEntity, final DamageSource source)
     {
+        if (source == playerEntity.damageSources().fall())
+        {
+            return false;
+        }
+
         updatePlayers();
         return playerDataMap.containsKey(playerEntity.getUUID());
     }
@@ -134,6 +125,18 @@ public class PlayerManager
         if (Logprot.config.getCommonConfig().debugOutput)
         {
             Logprot.LOGGER.info("Teleported player:" + player.getName().getString() + " now has login protection for " + Logprot.config.getCommonConfig().invulTime + " ticks");
+        }
+    }
+
+    /**
+     * Removes the player protection
+     * @param player
+     */
+    public void removeProtection(final ServerPlayer player)
+    {
+        if (player != null && playerDataMap.containsKey(player.getUUID()) && playerDataMap.remove(player.getUUID()) != null && Logprot.config.getCommonConfig().debugOutput)
+        {
+            Logprot.LOGGER.info("Player:" + player.getName().getString() + " got his login protection removed due to activity");
         }
     }
 }

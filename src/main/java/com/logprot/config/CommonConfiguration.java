@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 public class CommonConfiguration implements ICommonConfig
 {
     public int     invulTime           = 1000;
-    public int     maxDist             = 4;
     public boolean debugOutput         = false;
+    public boolean ignoreFallDamage         = true;
     public boolean dimensionprotection = true;
     public boolean respawnprotection   = true;
 
@@ -16,14 +16,14 @@ public class CommonConfiguration implements ICommonConfig
         final JsonObject root = new JsonObject();
 
         final JsonObject entry = new JsonObject();
-        entry.addProperty("desc:", "Time in ticks the logging player is invulnerable, 20 ticks is 1sec. Default is 50secs so 1000 ticks");
+        entry.addProperty("desc:", "Maximum time in ticks the logging player is invulnerable, 20 ticks is 1sec. Default is 50secs so 1000 ticks");
         entry.addProperty("invulTime", invulTime);
         root.add("invulTime", entry);
 
-        final JsonObject entry2 = new JsonObject();
-        entry2.addProperty("desc:", "Max distance in blocks(2d) the invulnerability lasts, default: 4");
-        entry2.addProperty("maxDist", maxDist);
-        root.add("maxDist", entry2);
+        final JsonObject entry8 = new JsonObject();
+        entry8.addProperty("desc:", "Allows fall-damage to bypass the protection, default: true");
+        entry8.addProperty("ignoreFallDamage", ignoreFallDamage);
+        root.add("ignoreFallDamage", entry8);
 
         final JsonObject entry3 = new JsonObject();
         entry3.addProperty("desc:",
@@ -49,8 +49,8 @@ public class CommonConfiguration implements ICommonConfig
     public void deserialize(JsonObject data)
     {
         invulTime = data.get("invulTime").getAsJsonObject().get("invulTime").getAsInt();
-        maxDist = data.get("maxDist").getAsJsonObject().get("maxDist").getAsInt();
         debugOutput = data.get("debugOutput").getAsJsonObject().get("debugOutput").getAsBoolean();
+        ignoreFallDamage = data.get("ignoreFallDamage").getAsJsonObject().get("ignoreFallDamage").getAsBoolean();
         dimensionprotection = data.get("dimensionprotection").getAsJsonObject().get("dimensionprotection").getAsBoolean();
         respawnprotection = data.get("respawnprotection").getAsJsonObject().get("respawnprotection").getAsBoolean();
     }
