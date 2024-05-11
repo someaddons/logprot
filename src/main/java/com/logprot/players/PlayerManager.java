@@ -91,7 +91,7 @@ public class PlayerManager
             {
                 if (Logprot.config.getCommonConfig().debugOutput)
                 {
-                    Logprot.LOGGER.info("Player:" + entry.getValue().player.getName().getString() + " got his login protection removed due to timeout");
+                    Logprot.LOGGER.info("Player:" + entry.getValue().player.getName().getString() + " got their login protection removed due to timeout");
                 }
 
                 entry.getValue().player.hurtTime = 0;
@@ -109,7 +109,7 @@ public class PlayerManager
      */
     public boolean isPlayerImmune(final Player playerEntity, final DamageSource source)
     {
-        if (source == playerEntity.damageSources().fall())
+        if (source == playerEntity.damageSources().fall() && Logprot.config.getCommonConfig().ignoreFallDamage)
         {
             return false;
         }
@@ -136,7 +136,7 @@ public class PlayerManager
     {
         if (player != null && playerDataMap.containsKey(player.getUUID()) && playerDataMap.remove(player.getUUID()) != null && Logprot.config.getCommonConfig().debugOutput)
         {
-            Logprot.LOGGER.info("Player:" + player.getName().getString() + " got his login protection removed due to activity");
+            Logprot.LOGGER.info("Player:" + player.getName().getString() + " got their login protection removed due to activity");
         }
     }
 }
