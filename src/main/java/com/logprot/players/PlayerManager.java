@@ -1,12 +1,14 @@
 package com.logprot.players;
 
 import com.logprot.Logprot;
-import com.logprot.Utils.BlockPosUtils;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.UUID;
 
 /**
  * Class managing the players which logged in
@@ -21,7 +23,7 @@ public class PlayerManager
     /**
      * Stores the logged players, allows gc deletion
      */
-    private WeakHashMap<Player, PlayerData> playerDataMap = new WeakHashMap<>();
+    private Map<UUID, PlayerData> playerDataMap = new HashMap<>();
 
     private PlayerManager() {}
 
@@ -46,7 +48,7 @@ public class PlayerManager
      */
     public void onPlayerLogin(final Player player)
     {
-        playerDataMap.put(player, new PlayerData(player, player.blockPosition(), System.currentTimeMillis() +  (Logprot.config.getCommonConfig().invulTime/20) * 1000L));
+        playerDataMap.put(player.getUUID(), new PlayerData(player, player.blockPosition(), System.currentTimeMillis() + (Logprot.config.getCommonConfig().invulTime / 20) * 1000L));
         if (Logprot.config.getCommonConfig().debugOutput)
         {
             Logprot.LOGGER.info("Player:" + player.getName().getString() + " now has login protection for " + Logprot.config.getCommonConfig().invulTime + " ticks");
@@ -63,30 +65,16 @@ public class PlayerManager
             return;
         }
 
-        final double maxDist = Math.pow(Logprot.config.getCommonConfig().maxDist, 2);
-
-        Iterator<Map.Entry<Player, PlayerData>> iterator = playerDataMap.entrySet().iterator();
+        Iterator<Map.Entry<UUID, PlayerData>> iterator = playerDataMap.entrySet().iterator();
 
         long currentTime = System.currentTimeMillis();
 
         while (iterator.hasNext())
         {
-            Map.Entry<Player, PlayerData> entry = iterator.next();
+            Map.Entry<UUID, PlayerData> entry = iterator.next();
 
-            if (!entry.getKey().isAlive())
+            if (!entry.getValue().player.isAlive())
             {
-                iterator.remove();
-                break;
-            }
-
-            if (BlockPosUtils.dist2DSQ(entry.getValue().loginPos, entry.getKey().blockPosition()) > maxDist)
-            {
-                if (Logprot.config.getCommonConfig().debugOutput)
-                {
-                    Logprot.LOGGER.info("Player:" + entry.getKey().getName().getString() + " got his login protection removed due to moving");
-                }
-
-                entry.getKey().hurtTime = 0;
                 iterator.remove();
                 break;
             }
@@ -96,10 +84,10 @@ public class PlayerManager
             {
                 if (Logprot.config.getCommonConfig().debugOutput)
                 {
-                    Logprot.LOGGER.info("Player:" + entry.getKey().getName().getString() + " got his login protection removed due to timeout");
+                    Logprot.LOGGER.info("Player:" + entry.getValue().player.getName().getString() + " got their login protection removed due to timeout");
                 }
 
-                entry.getKey().hurtTime = 0;
+                entry.getValue().player.hurtTime = 0;
                 iterator.remove();
             }
         }
@@ -109,16 +97,35 @@ public class PlayerManager
      * Whether the player is immune
      *
      * @param playerEntity
+     * @param source
      * @return
      */
-    public boolean isPlayerImmune(final Player playerEntity)
+    public boolean isPlayerImmune(final Player playerEntity, final DamageSource source)
     {
         if (playerDataMap.isEmpty())
         {
             return false;
         }
 
+        if (source == playerEntity.damageSources().fall() && Logprot.config.getCommonConfig().ignoreFallDamage)
+        {
+            return false;
+        }
+
         updatePlayers();
-        return playerDataMap.containsKey(playerEntity);
+        return playerDataMap.containsKey(playerEntity.getUUID());
+    }
+
+    /**
+     * Removes the player protection
+     *
+     * @param player
+     */
+    public void removeProtection(final ServerPlayer player)
+    {
+        if (player != null && playerDataMap.containsKey(player.getUUID()) && playerDataMap.remove(player.getUUID()) != null && Logprot.config.getCommonConfig().debugOutput)
+        {
+            Logprot.LOGGER.info("Player:" + player.getName().getString() + " got their login protection removed due to activity");
+        }
     }
 }
