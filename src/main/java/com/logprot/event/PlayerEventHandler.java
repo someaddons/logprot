@@ -2,9 +2,9 @@ package com.logprot.event;
 
 import com.logprot.players.PlayerManager;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
  * Eventhandler for the players which are currently invulnerable, removed when no players are invulnverable.
@@ -19,16 +19,13 @@ public class PlayerEventHandler
     }
 
     @SubscribeEvent
-    public void onServerTick(final TickEvent.ServerTickEvent event)
+    public void onServerTick(final ServerTickEvent.Post event)
     {
-        if (event.phase == TickEvent.Phase.END)
-        {
-            PlayerManager.getInstance().updatePlayers();
-        }
+        PlayerManager.getInstance().updatePlayers();
     }
 
     @SubscribeEvent
-    public void onLivingDamageEvent(LivingDamageEvent event)
+    public void onLivingDamageEvent(LivingDamageEvent.Pre event)
     {
         if (!(event.getEntity() instanceof Player))
         {
@@ -37,7 +34,7 @@ public class PlayerEventHandler
 
         if (PlayerManager.getInstance().isPlayerImmune((Player) event.getEntity(), event.getSource()))
         {
-            event.setAmount(0);
+            event.setNewDamage(0);
         }
     }
 }

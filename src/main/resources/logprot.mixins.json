@@ -1,11 +1,12 @@
 {
   "required": false,
   "package": "com.logprot.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "refmap": "logprot.refmap.json",
   "mixins": [
-    "ServerPlayerMixin",
-    "ServerGamePacketListenerImplMixin"
+    "DamageMixin",
+    "ServerGamePacketListenerImplMixin",
+    "ServerPlayerMixin"
   ],
   "client": [
   ],

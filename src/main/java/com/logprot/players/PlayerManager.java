@@ -1,16 +1,17 @@
 package com.logprot.players;
 
 import com.logprot.Logprot;
-import com.logprot.Utils.BlockPosUtils;
 import com.logprot.event.PlayerEventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Class managing the players which logged in
@@ -39,7 +40,7 @@ public class PlayerManager
         if (PlayerManager.instance == null)
         {
             PlayerManager.instance = new PlayerManager();
-            Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(PlayerEventHandler.getInstance());
+            NeoForge.EVENT_BUS.register(PlayerEventHandler.getInstance());
         }
         return PlayerManager.instance;
     }

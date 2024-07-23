@@ -2,10 +2,10 @@ package com.logprot;
 
 import com.cupboard.config.CupboardConfig;
 import com.logprot.config.CommonConfiguration;
-import com.logprot.event.EventHandler;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,12 +20,10 @@ public class Logprot
      */
     public static CupboardConfig<CommonConfiguration> config = new CupboardConfig<>(Constants.MOD_ID, new CommonConfiguration());
 
-    public Logprot()
+    public Logprot(IEventBus modEventBus, ModContainer modContainer)
     {
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-
-        Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(EventHandler.class);
+        modEventBus.addListener(this::setup);
     }
 
     private void setup(final FMLCommonSetupEvent event)
