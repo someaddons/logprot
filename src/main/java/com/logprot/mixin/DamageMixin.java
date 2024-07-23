@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.portal.DimensionTransition;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,10 +26,9 @@ public class DamageMixin
         }
     }
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getActiveEffects()Ljava/util/Collection;"), method = "changeDimension")
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;sendActivePlayerEffects(Lnet/minecraft/server/level/ServerPlayer;)V"), method = "changeDimension")
     private void onChangeDim(
-      final ServerLevel destination,
-      final CallbackInfoReturnable<Entity> cir)
+      final DimensionTransition dimensionTransition, final CallbackInfoReturnable<Entity> cir)
     {
         if (Logprot.config.getCommonConfig().dimensionprotection)
         {
@@ -36,7 +36,7 @@ public class DamageMixin
         }
     }
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;sendAllPlayerInfo(Lnet/minecraft/server/level/ServerPlayer;)V"), method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V")
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFF)V"), method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V")
     private void onTP(
       final ServerLevel serverLevel, final double d, final double e, final double f, final float g, final float h, final CallbackInfo ci)
     {
