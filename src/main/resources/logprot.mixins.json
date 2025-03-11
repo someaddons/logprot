@@ -5,8 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "DamageMixin",
-    "ServerGamePacketListenerImplMixin",
-    "ServerPlayerMixin"
+    "ServerGamePacketListenerImplMixin"
   ],
   "client": [
   ],
