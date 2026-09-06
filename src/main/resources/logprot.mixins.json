@@ -5,6 +5,7 @@
   "refmap": "logprot.refmap.json",
   "mixins": [
     "DamageMixin",
+    "PlayerListMixin",
     "ServerGamePacketListenerImplMixin"
   ],
   "client": [
