@@ -1,8 +1,6 @@
 {
   "required": false,
   "package": "com.logprot.mixin",
-  "compatibilityLevel": "JAVA_21",
-  "refmap": "logprot.refmap.json",
   "mixins": [
     "DamageMixin",
     "PlayerListMixin",
